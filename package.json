@@ -1,0 +1,14 @@
+{
+  "name": "scorm-cevs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SCORM Content Extraction and Versioning System",
+  "scripts": {
+    "setup": "npm install --ignore-scripts && node scripts/install-python-deps.js",
+    "prestart": "node scripts/install-python-deps.js",
+    "start": "node scripts/run-uvicorn.js",
+    "start:reload": "node scripts/run-uvicorn.js --reload",
+    "pretest": "node scripts/install-python-deps.js",
+    "test": "pytest -q"
+  }
+}

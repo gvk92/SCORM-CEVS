@@ -1,0 +1,10 @@
+__pycache__/
+.pytest_cache/
+.venv/
+storage/raw_scorms/*
+storage/courses/*
+storage/master/*
+!storage/raw_scorms/.gitkeep
+!storage/courses/.gitkeep
+!storage/master/.gitkeep
+storage/registry.json
