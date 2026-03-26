@@ -211,15 +211,23 @@ def _extract_text_blocks(soup: BeautifulSoup) -> list[ContentBlock]:
     return deduped
 
 
+
+
+def _safe_lesson_path(extract_root: Path, href: str) -> Path | None:
+    if not href:
+        return None
+    candidate = (extract_root / href.lstrip('/')).resolve()
+    if not str(candidate).startswith(str(extract_root.resolve())):
+        return None
+    return candidate
+
 def _populate_lesson_content(extract_root: Path, modules: list[Module]) -> list[Module]:
     for module in modules:
         for lesson in module.lessons:
             if not lesson.href:
                 continue
-            lesson_path = extract_root / lesson.href
-            if not lesson_path.exists() and lesson.href.startswith("/"):
-                lesson_path = extract_root / lesson.href.lstrip("/")
-            if not lesson_path.exists() or lesson_path.suffix.lower() not in {".htm", ".html", ".xhtml"}:
+            lesson_path = _safe_lesson_path(extract_root, lesson.href)
+            if not lesson_path or not lesson_path.exists() or lesson_path.suffix.lower() not in {".htm", ".html", ".xhtml"}:
                 continue
             html = lesson_path.read_text(encoding="utf-8", errors="ignore")
             soup = BeautifulSoup(html, "html.parser")
@@ -262,13 +270,13 @@ def process_scorm_zip(zip_path: Path, course_id: str) -> dict:
 
 
 def rebuild_master_json() -> dict:
-    from .storage import load_registry, read_json
+    from .storage import load_registry, read_json, course_version_read_path
 
     registry = load_registry()
     courses = []
 
     for course_id, entry in registry.courses.items():
-        latest_path = course_version_path(course_id, entry.currentVersion)
+        latest_path = course_version_read_path(course_id, entry.currentVersion)
         if latest_path.exists():
             courses.append(read_json(latest_path))
 

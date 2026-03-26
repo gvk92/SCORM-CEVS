@@ -10,6 +10,8 @@ def _lesson_fingerprints(course_data: dict) -> dict[str, str]:
     for module in course_data.get("modules", []):
         for lesson in module.get("lessons", []):
             key = lesson.get("id") or lesson.get("href")
+            if not key:
+                continue
             blocks = lesson.get("content_blocks", [])
             text = "|".join((b.get("type", "") + ":" + (b.get("text") or "")) for b in blocks)
             fingerprints[key] = text
@@ -20,7 +22,9 @@ def lesson_ids(course_data: dict) -> set[str]:
     ids: set[str] = set()
     for module in course_data.get("modules", []):
         for lesson in module.get("lessons", []):
-            ids.add(lesson.get("id") or lesson.get("href"))
+            lesson_key = lesson.get("id") or lesson.get("href")
+            if lesson_key:
+                ids.add(lesson_key)
     return ids
 
 

@@ -96,3 +96,42 @@ def test_rejects_unsafe_zip_entries(tmp_path: Path, monkeypatch) -> None:
         assert False, "Expected unsafe ZIP path to raise ValueError"
     except ValueError as exc:
         assert "Unsafe ZIP entry path" in str(exc)
+
+
+def test_manifest_href_path_traversal_is_ignored(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(settings, "storage_root", tmp_path / "storage")
+    monkeypatch.setattr(settings, "raw_scorm_dir", settings.storage_root / "raw_scorms")
+    monkeypatch.setattr(settings, "courses_dir", settings.storage_root / "courses")
+    monkeypatch.setattr(settings, "master_dir", settings.storage_root / "master")
+    monkeypatch.setattr(settings, "registry_file", settings.storage_root / "registry.json")
+    monkeypatch.setattr(settings, "master_file", settings.master_dir / "master_courses.json")
+
+    ensure_storage()
+
+    manifest = """<?xml version='1.0' encoding='UTF-8'?>
+<manifest identifier='MANIFEST'>
+  <organizations default='ORG'>
+    <organization identifier='ORG'>
+      <title>Demo Course</title>
+      <item identifier='MODULE1'>
+        <title>Module 1</title>
+        <item identifier='LESSON1' identifierref='RES1'>
+          <title>Lesson One</title>
+        </item>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource identifier='RES1' href='../outside.html' type='webcontent'/>
+  </resources>
+</manifest>
+"""
+
+    bad_href_zip = tmp_path / "bad_href.zip"
+    with zipfile.ZipFile(bad_href_zip, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("imsmanifest.xml", manifest)
+
+    payload = process_scorm_zip(bad_href_zip, course_id="course-safe")
+    lesson = payload["modules"][0]["lessons"][0]
+    assert lesson["href"] == "../outside.html"
+    assert lesson["content_blocks"] == []

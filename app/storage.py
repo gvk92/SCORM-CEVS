@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import json
+import threading
 from pathlib import Path
 from typing import Any
 
 from .config import settings
 from .models import Registry, RegistryEntry
+
+_registry_lock = threading.RLock()
 
 
 def ensure_storage() -> None:
@@ -18,15 +21,17 @@ def ensure_storage() -> None:
 
 def load_registry() -> Registry:
     ensure_storage()
-    data = json.loads(settings.registry_file.read_text(encoding="utf-8"))
+    with _registry_lock:
+        data = json.loads(settings.registry_file.read_text(encoding="utf-8"))
     return Registry.model_validate(data)
 
 
 def save_registry(registry: Registry) -> None:
-    settings.registry_file.write_text(
-        json.dumps(registry.model_dump(), indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
+    with _registry_lock:
+        settings.registry_file.write_text(
+            json.dumps(registry.model_dump(), indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
 
 
 def next_version(course_id: str) -> str:
@@ -39,21 +44,29 @@ def next_version(course_id: str) -> str:
 
 
 def update_registry(course_id: str, version: str) -> None:
-    registry = load_registry()
-    entry = registry.courses.get(course_id)
-    if entry is None:
-        registry.courses[course_id] = RegistryEntry(currentVersion=version, versions=[version])
-    else:
-        entry.currentVersion = version
-        if version not in entry.versions:
-            entry.versions.append(version)
-    save_registry(registry)
+    with _registry_lock:
+        registry = load_registry()
+        entry = registry.courses.get(course_id)
+        if entry is None:
+            registry.courses[course_id] = RegistryEntry(currentVersion=version, versions=[version])
+        else:
+            entry.currentVersion = version
+            if version not in entry.versions:
+                entry.versions.append(version)
+        settings.registry_file.write_text(
+            json.dumps(registry.model_dump(), indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
 
 
 def course_version_path(course_id: str, version: str) -> Path:
     course_dir = settings.courses_dir / course_id
     course_dir.mkdir(parents=True, exist_ok=True)
     return course_dir / f"{course_id}_{version}.json"
+
+
+def course_version_read_path(course_id: str, version: str) -> Path:
+    return settings.courses_dir / course_id / f"{course_id}_{version}.json"
 
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -69,7 +82,7 @@ def latest_course_json(course_id: str) -> dict[str, Any] | None:
     entry = registry.courses.get(course_id)
     if not entry:
         return None
-    path = course_version_path(course_id, entry.currentVersion)
+    path = course_version_read_path(course_id, entry.currentVersion)
     if not path.exists():
         return None
     return read_json(path)

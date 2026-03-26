@@ -22,6 +22,10 @@
           <label>SCORM ZIP file
             <input type="file" id="single-file" accept=".zip" required />
           </label>
+          <div class="progress-wrap" id="single-progress-wrap">
+            <progress id="single-progress" max="100" value="0"></progress>
+            <span id="single-progress-text">Idle</span>
+          </div>
           <button type="submit">Upload Course</button>
         </form>
       </section>
@@ -36,6 +40,10 @@
           <label>SCORM ZIP files
             <input type="file" id="bulk-files" accept=".zip" multiple required />
           </label>
+          <div class="progress-wrap" id="bulk-progress-wrap">
+            <progress id="bulk-progress" max="100" value="0"></progress>
+            <span id="bulk-progress-text">Idle</span>
+          </div>
           <button type="submit">Upload Batch</button>
         </form>
       </section>

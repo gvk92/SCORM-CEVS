@@ -11,5 +11,7 @@ class Settings:
     registry_file: Path = storage_root / "registry.json"
     master_file: Path = master_dir / "master_courses.json"
 
+    max_upload_bytes: int = 10 * 1024 * 1024 * 1024  # 10GB
+
 
 settings = Settings()

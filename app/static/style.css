@@ -14,3 +14,5 @@ button:hover { opacity: .93; }
 #courses th, #courses td { padding: 8px; border-bottom: 1px solid #eef2f8; text-align: left; }
 .hint { color: #5a6475; margin-top: -8px; }
 pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; max-height: 240px; overflow: auto; }
+.progress-wrap { display: flex; align-items: center; gap: 10px; margin: 10px 0 14px; }
+progress { width: 100%; height: 14px; }
