@@ -55,6 +55,8 @@ uvicorn app.main:app --reload
 
 Run this once on a new machine to install both Node and Python requirements:
 
+If Python 3.14+ is detected, setup automatically uses a flexible dependency set (`requirements-flex.txt`) to avoid pinned packages that may not yet ship wheels for newer interpreters.
+
 ```bash
 npm run setup
 ```
