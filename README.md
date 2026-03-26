@@ -1,2 +1,115 @@
 # SCORM-CEVS
-Transform SCORM packages into a persistent, version-controlled knowledge layer that can be directly used by AI systems (bots, search, assistants).
+
+SCORM Content Extraction and Versioning System (CEVS) that converts SCORM packages into structured, versioned JSON for AI consumption.
+
+## What it does
+
+- Accepts `.zip` SCORM packages (single or bulk).
+- Persists raw uploads to disk.
+- Streams ZIP extraction to temporary disk folders (no full in-memory unzip).
+- Parses `imsmanifest.xml` for course/module/lesson hierarchy, including nested items.
+- Extracts text from lesson HTML, including interactive containers (accordion, tabs, flipcards, carousels, expandable sections).
+- Filters common UI noise (nav/footer/menu/button-heavy wrappers) from content output.
+- Produces versioned per-course JSON (`{courseId}_v1.json`, `{courseId}_v2.json`, ...).
+- Maintains a `master_courses.json` containing only latest LIVE course versions.
+- Provides a friendly web dashboard at `/` for uploads and live catalog monitoring.
+
+## Storage layout
+
+```text
+/storage/
+  raw_scorms/
+    {courseId}_{timestamp}.zip
+
+  courses/
+    {courseId}/
+      {courseId}_v1.json
+      {courseId}_v2.json
+
+  master/
+    master_courses.json
+
+  registry.json
+```
+
+## API endpoints
+
+- `GET /` (dashboard UI)
+- `GET /health`
+- `GET /courses`
+- `POST /upload?course_id=<id>`
+  - multipart with one file field named `file`
+- `POST /upload/bulk?course_ids=id1,id2,...`
+  - multipart with multiple `files`
+
+## Run locally
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+## Install all local dependencies
+
+Run this once on a new machine to install both Node and Python requirements:
+
+```bash
+npm run setup
+```
+
+This installs from `requirements.txt` (unpinned, better cross-version compatibility). If you need deterministic pinned versions, run with:
+
+```bash
+SCORM_USE_LOCKED=1 npm run setup
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:SCORM_USE_LOCKED="1"; npm run setup
+```
+
+## Run with npm
+
+Install dependencies first (once):
+
+```bash
+npm run setup
+```
+
+Then start the app:
+
+```bash
+npm start
+```
+
+Then open: `http://127.0.0.1:8000/`
+
+> Do not open `http://0.0.0.0:8000/` in a browser. `0.0.0.0` is a bind address, not a navigable URL.
+
+For hot reload during development:
+
+```bash
+npm run start:reload
+```
+
+To expose the server on your local network:
+
+```bash
+SCORM_HOST=0.0.0.0 SCORM_PORT=8000 npm start
+```
+
+## Test
+
+```bash
+npm run test
+```
+
+> If this is your first run on a machine, run `npm run setup` first.
+
+
+### Windows note
+
+The npm scripts auto-detect `python`, `python3`, or `py`. So Windows (`py`) and Linux/macOS (`python3`) setups both work with `npm run setup` and `npm start`.
