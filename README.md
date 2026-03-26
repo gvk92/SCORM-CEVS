@@ -73,9 +73,21 @@ $env:SCORM_USE_LOCKED="1"; npm run setup
 
 ## Run with npm
 
+Install dependencies first (once):
+
+```bash
+npm run setup
+```
+
+Then start the app:
+
 ```bash
 npm start
 ```
+
+Then open: `http://127.0.0.1:8000/`
+
+> Do not open `http://0.0.0.0:8000/` in a browser. `0.0.0.0` is a bind address, not a navigable URL.
 
 For hot reload during development:
 
@@ -83,11 +95,19 @@ For hot reload during development:
 npm run start:reload
 ```
 
+To expose the server on your local network:
+
+```bash
+SCORM_HOST=0.0.0.0 SCORM_PORT=8000 npm start
+```
+
 ## Test
 
 ```bash
 npm run test
 ```
+
+> If this is your first run on a machine, run `npm run setup` first.
 
 
 ### Windows note
