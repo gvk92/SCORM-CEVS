@@ -55,10 +55,20 @@ uvicorn app.main:app --reload
 
 Run this once on a new machine to install both Node and Python requirements:
 
-If Python 3.14+ is detected, setup automatically uses a flexible dependency set (`requirements-flex.txt`) to avoid pinned packages that may not yet ship wheels for newer interpreters.
-
 ```bash
 npm run setup
+```
+
+This installs from `requirements.txt` (unpinned, better cross-version compatibility). If you need deterministic pinned versions, run with:
+
+```bash
+SCORM_USE_LOCKED=1 npm run setup
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:SCORM_USE_LOCKED="1"; npm run setup
 ```
 
 ## Run with npm
