@@ -76,3 +76,8 @@ npm run start:reload
 ```bash
 npm run test
 ```
+
+
+### Windows note
+
+The npm scripts auto-detect `python`, `python3`, or `py`. So Windows (`py`) and Linux/macOS (`python3`) setups both work with `npm run setup` and `npm start`.

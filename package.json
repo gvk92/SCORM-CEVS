@@ -4,11 +4,11 @@
   "private": true,
   "description": "SCORM Content Extraction and Versioning System",
   "scripts": {
-    "setup": "npm install --ignore-scripts && py -m pip install -r requirements.txt",
-    "prestart": "py -m pip install -r requirements.txt",
-    "start": "uvicorn app.main:app --host 0.0.0.0 --port 8000",
-    "start:reload": "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
-    "pretest": "py -m pip install -r requirements.txt",
+    "setup": "npm install --ignore-scripts && node scripts/install-python-deps.js",
+    "prestart": "node scripts/install-python-deps.js",
+    "start": "node scripts/run-uvicorn.js",
+    "start:reload": "node scripts/run-uvicorn.js --reload",
+    "pretest": "node scripts/install-python-deps.js",
     "test": "pytest -q"
   }
 }
