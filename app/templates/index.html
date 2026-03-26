@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCORM CEVS Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>SCORM Content Extraction & Versioning</h1>
+        <p>Upload SCORM packages, track versions, and monitor the LIVE course catalog.</p>
+      </header>
+
+      <section class="card">
+        <h2>Single Upload</h2>
+        <form id="single-form">
+          <label>Course ID
+            <input type="text" id="single-course-id" placeholder="e.g., safety-101" required />
+          </label>
+          <label>SCORM ZIP file
+            <input type="file" id="single-file" accept=".zip" required />
+          </label>
+          <div class="progress-wrap" id="single-progress-wrap">
+            <progress id="single-progress" max="100" value="0"></progress>
+            <span id="single-progress-text">Idle</span>
+          </div>
+          <button type="submit">Upload Course</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Bulk Upload</h2>
+        <p class="hint">Add course IDs as comma-separated values in the same order as selected files.</p>
+        <form id="bulk-form">
+          <label>Course IDs
+            <input type="text" id="bulk-course-ids" placeholder="course-a,course-b" required />
+          </label>
+          <label>SCORM ZIP files
+            <input type="file" id="bulk-files" accept=".zip" multiple required />
+          </label>
+          <div class="progress-wrap" id="bulk-progress-wrap">
+            <progress id="bulk-progress" max="100" value="0"></progress>
+            <span id="bulk-progress-text">Idle</span>
+          </div>
+          <button type="submit">Upload Batch</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="row">
+          <h2>LIVE Courses</h2>
+          <button id="refresh-courses" class="ghost">Refresh</button>
+        </div>
+        <div id="courses"></div>
+      </section>
+
+      <section class="card">
+        <h2>Activity</h2>
+        <pre id="log">Ready.</pre>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
