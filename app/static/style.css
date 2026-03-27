@@ -1,18 +1,42 @@
-:root { font-family: Inter, system-ui, Arial, sans-serif; }
-body { margin: 0; background: #f4f7fb; color: #122033; }
-.container { max-width: 980px; margin: 0 auto; padding: 24px; }
-h1 { margin-bottom: 4px; }
-header p { margin-top: 0; color: #445; }
-.card { background: #fff; border-radius: 12px; padding: 16px; margin: 16px 0; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
-label { display: block; margin: 10px 0; font-weight: 600; }
-input { width: 100%; margin-top: 6px; padding: 10px; border: 1px solid #ccd4e0; border-radius: 8px; }
-button { padding: 10px 14px; border-radius: 8px; border: none; background: #1769ff; color: white; cursor: pointer; }
-button.ghost { background: #e7eefc; color: #174ea6; }
-button:hover { opacity: .93; }
-.row { display: flex; justify-content: space-between; align-items: center; }
-#courses table { width: 100%; border-collapse: collapse; }
-#courses th, #courses td { padding: 8px; border-bottom: 1px solid #eef2f8; text-align: left; }
-.hint { color: #5a6475; margin-top: -8px; }
-pre { background: #0f172a; color: #cbd5e1; padding: 12px; border-radius: 8px; max-height: 240px; overflow: auto; }
-.progress-wrap { display: flex; align-items: center; gap: 10px; margin: 10px 0 14px; }
+:root {
+  --bg: #f3f6fb;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #5b677d;
+  --primary: #2563eb;
+  --border: #d8e0ee;
+  font-family: Inter, Segoe UI, system-ui, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 28px; background: #0b1220; color: white; }
+.topbar h1 { margin: 0; font-size: 1.35rem; }
+.subtitle { margin: 4px 0 0; color: #b7c2d8; }
+.status-pill { background: #16a34a; color: white; padding: 8px 12px; border-radius: 999px; font-weight: 600; }
+.container { max-width: 1180px; margin: 0 auto; padding: 20px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+.kpi-card { background: var(--card); border-radius: 12px; padding: 14px; border: 1px solid var(--border); }
+.kpi-card span { color: var(--muted); display: block; font-size: .86rem; }
+.kpi-card strong { font-size: 1.25rem; }
+.card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+h2 { margin: 0 0 10px; font-size: 1.1rem; }
+.form-grid { display: grid; gap: 10px; }
+label { font-weight: 600; color: #243041; }
+input, select { width: 100%; margin-top: 6px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+button { border: 0; border-radius: 8px; padding: 10px 14px; font-weight: 600; color: white; background: var(--primary); cursor: pointer; }
+button.ghost { color: #1d4ed8; background: #e8f0ff; }
+button:disabled { opacity: .6; cursor: not-allowed; }
+.hint { color: var(--muted); margin-top: -4px; }
+.progress-wrap { display: flex; align-items: center; gap: 10px; }
 progress { width: 100%; height: 14px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.row-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+#courses table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+#courses th, #courses td { padding: 9px; border-bottom: 1px solid #edf1f7; text-align: left; }
+pre { margin: 10px 0 0; background: #0b1220; color: #dbe5ff; padding: 12px; border-radius: 8px; max-height: 360px; overflow: auto; font-size: .85rem; }
+#output-json { max-height: 520px; }
+#loading-overlay { position: fixed; inset: 0; background: rgba(11,18,32,.6); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; z-index: 1000; }
+.hidden { display: none !important; }
+.loader { width: 44px; height: 44px; border: 4px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; animation: spin .9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.toast { position: fixed; right: 16px; bottom: 16px; background: #111827; color: white; padding: 10px 14px; border-radius: 8px; z-index: 1001; }

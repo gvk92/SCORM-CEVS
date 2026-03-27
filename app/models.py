@@ -17,6 +17,8 @@ class Lesson(BaseModel):
     title: str
     href: str
     content_blocks: list[ContentBlock] = Field(default_factory=list)
+    extracted_text: str = ""
+    block_count: int = 0
 
 
 class Module(BaseModel):
@@ -38,6 +40,7 @@ class CourseVersion(BaseModel):
     source_file: str
     course_title: str
     modules: list[Module]
+    extraction_summary: dict = Field(default_factory=dict)
     change_summary: ChangeSummary = Field(default_factory=ChangeSummary)
 
 

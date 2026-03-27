@@ -34,6 +34,7 @@ def _make_scorm(path: Path, lesson_text: str) -> None:
     html = f"""<html><body>
       <div class='accordion'><h3>Details</h3><p>{lesson_text}</p></div>
       <div class='nav'>ignore this nav text</div>
+      <button aria-label='Extra accessibility text'>Read more</button>
       <p>Body copy.</p>
     </body></html>"""
 
@@ -57,8 +58,11 @@ def test_process_and_versioning(tmp_path: Path, monkeypatch) -> None:
     v1 = process_scorm_zip(zip1, course_id="course-abc")
     assert v1["version"] == "v1"
     assert v1["change_summary"]["added_lessons"] == ["LESSON1"]
+    assert v1["extraction_summary"]["lesson_count"] == 1
     assert any("Submodule 1" in l["title"] for m in v1["modules"] for l in m["lessons"])
     assert not any("ignore this nav text" in (b.get("text") or "") for m in v1["modules"] for l in m["lessons"] for b in l["content_blocks"])
+    assert any("Extra accessibility text" in (b.get("text") or "") for m in v1["modules"] for l in m["lessons"] for b in l["content_blocks"])
+    assert all(l["block_count"] >= 1 and len(l["extracted_text"]) >= 3 for m in v1["modules"] for l in m["lessons"])
 
     v1_path = settings.courses_dir / "course-abc" / "course-abc_v1.json"
     assert v1_path.exists()

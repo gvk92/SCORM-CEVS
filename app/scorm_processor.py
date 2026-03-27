@@ -191,13 +191,23 @@ def _extract_text_blocks(soup: BeautifulSoup) -> list[ContentBlock]:
     interactives = _extract_interactives(soup)
     blocks.extend(interactives)
 
-    for node in soup.find_all(["p", "li", "div", "span", "h1", "h2", "h3", "h4"]):
+    content_tags = ["p", "li", "div", "span", "h1", "h2", "h3", "h4", "h5", "h6", "td", "th", "label", "summary", "button"]
+    for node in soup.find_all(content_tags):
         if _is_ui_noise(node):
             continue
-        text = _extract_block_text(node)
-        if len(text) < 3:
+        node_text = _extract_block_text(node)
+        if len(node_text) < 3:
             continue
-        blocks.append(ContentBlock(type="text", text=text))
+        blocks.append(ContentBlock(type="text", text=node_text))
+
+    # Include semantic text from accessibility/helper attributes commonly used in interactive SCORMs.
+    for node in soup.find_all(True):
+        if _is_ui_noise(node):
+            continue
+        for attr in ["aria-label", "title", "data-title", "data-caption"]:
+            attr_value = _strip_text(node.get(attr))
+            if len(attr_value) >= 3:
+                blocks.append(ContentBlock(type="text", text=attr_value))
 
     deduped: list[ContentBlock] = []
     seen: set[tuple[str, str]] = set()
@@ -208,10 +218,31 @@ def _extract_text_blocks(soup: BeautifulSoup) -> list[ContentBlock]:
         seen.add(key)
         deduped.append(block)
 
+    if not deduped and soup.body:
+        fallback_text = _strip_text(soup.body.get_text(" ", strip=True))
+        if fallback_text:
+            deduped.append(ContentBlock(type="text", text=fallback_text))
+
     return deduped
 
 
 
+
+
+
+def _lesson_text_from_blocks(blocks: list[ContentBlock]) -> str:
+    chunks: list[str] = []
+    for block in blocks:
+        if block.title:
+            chunks.append(block.title)
+        if block.text:
+            chunks.append(block.text)
+        for item in block.items:
+            if item.get("title"):
+                chunks.append(_strip_text(item.get("title")))
+            if item.get("text"):
+                chunks.append(_strip_text(item.get("text")))
+    return _strip_text(" ".join(chunks))
 
 def _safe_lesson_path(extract_root: Path, href: str) -> Path | None:
     if not href:
@@ -232,6 +263,8 @@ def _populate_lesson_content(extract_root: Path, modules: list[Module]) -> list[
             html = lesson_path.read_text(encoding="utf-8", errors="ignore")
             soup = BeautifulSoup(html, "html.parser")
             lesson.content_blocks = _extract_text_blocks(soup)
+            lesson.block_count = len(lesson.content_blocks)
+            lesson.extracted_text = _lesson_text_from_blocks(lesson.content_blocks)
     return modules
 
 
@@ -251,6 +284,10 @@ def process_scorm_zip(zip_path: Path, course_id: str) -> dict:
         modules = _populate_lesson_content(extract_root, modules)
 
     created_at = datetime.now(timezone.utc).isoformat()
+    total_modules = len(modules)
+    total_lessons = sum(len(m.lessons) for m in modules)
+    total_blocks = sum(lesson.block_count for module in modules for lesson in module.lessons)
+
     current_data = CourseVersion(
         course_id=course_id,
         version=version,
@@ -258,6 +295,11 @@ def process_scorm_zip(zip_path: Path, course_id: str) -> dict:
         source_file=str(raw_zip_path),
         course_title=course_title,
         modules=modules,
+        extraction_summary={
+            "module_count": total_modules,
+            "lesson_count": total_lessons,
+            "content_block_count": total_blocks,
+        },
     ).model_dump()
 
     previous_data = latest_course_json(course_id)
