@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCORM CEVS Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>SCORM Content Extraction & Versioning</h1>
+        <p class="subtitle">Enterprise ingestion, extraction, and JSON knowledge publishing.</p>
+      </div>
+      <div class="status-pill" id="system-status">System Ready</div>
+    </header>
+
+    <main class="container">
+      <section class="kpi-grid">
+        <article class="kpi-card"><span>Total Courses</span><strong id="kpi-courses">0</strong></article>
+        <article class="kpi-card"><span>Total Lessons</span><strong id="kpi-lessons">0</strong></article>
+        <article class="kpi-card"><span>Last Updated</span><strong id="kpi-updated">-</strong></article>
+      </section>
+
+      <section class="card">
+        <h2>Single Upload</h2>
+        <form id="single-form" class="form-grid">
+          <label>Course ID
+            <input type="text" id="single-course-id" placeholder="e.g., safety-101" required />
+          </label>
+          <label>SCORM ZIP file
+            <input type="file" id="single-file" accept=".zip" required />
+          </label>
+          <div class="progress-wrap">
+            <progress id="single-progress" max="100" value="0"></progress>
+            <span id="single-progress-text">Idle</span>
+          </div>
+          <button type="submit">Upload Course</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Bulk Upload</h2>
+        <p class="hint">Provide course IDs in the same order as selected files.</p>
+        <form id="bulk-form" class="form-grid">
+          <label>Course IDs
+            <input type="text" id="bulk-course-ids" placeholder="course-a,course-b" required />
+          </label>
+          <label>SCORM ZIP files
+            <input type="file" id="bulk-files" accept=".zip" multiple required />
+          </label>
+          <div class="progress-wrap">
+            <progress id="bulk-progress" max="100" value="0"></progress>
+            <span id="bulk-progress-text">Idle</span>
+          </div>
+          <button type="submit">Upload Batch</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="row">
+          <h2>LIVE Courses</h2>
+          <div class="row-actions">
+            <input id="course-filter" placeholder="Filter courses..." />
+            <button id="refresh-courses" class="ghost">Refresh</button>
+          </div>
+        </div>
+        <div id="courses"></div>
+      </section>
+
+      <section class="card">
+        <div class="row">
+          <h2>Output Viewer</h2>
+          <div class="row-actions">
+            <select id="output-course-select"></select>
+            <button id="load-course-output" class="ghost">Load Course JSON</button>
+            <button id="load-master-output" class="ghost">Load Master JSON</button>
+          </div>
+        </div>
+        <div class="row-actions">
+          <button id="download-course-output" class="ghost">Export Course JSON</button>
+          <button id="download-master-output" class="ghost">Export Master JSON</button>
+          <button id="copy-output-json" class="ghost">Copy JSON</button>
+        </div>
+        <pre id="output-json">No output loaded yet.</pre>
+      </section>
+
+      <section class="card">
+        <h2>Activity Log</h2>
+        <pre id="log">Ready.</pre>
+      </section>
+    </main>
+
+    <div id="loading-overlay" class="hidden">
+      <div class="loader"></div>
+      <p id="loading-text">Processing...</p>
+    </div>
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
